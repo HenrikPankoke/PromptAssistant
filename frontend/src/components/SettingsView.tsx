@@ -6,7 +6,7 @@ import { setCloseBlocked } from '../closeGuard'
 import { Button, IconButton, Label, Select, TextArea, TextInput, Toggle } from './ui'
 import { RecipeEditorModal } from './RecipeEditorModal'
 
-type Section = 'provider' | 'general' | 'prompts' | 'chat' | 'stats'
+type Section = 'provider' | 'general' | 'prompts' | 'chat' | 'stats' | 'about'
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: 'general', label: 'General' },
@@ -14,9 +14,11 @@ const SECTIONS: { key: Section; label: string }[] = [
   { key: 'chat', label: 'Chat' },
   { key: 'provider', label: 'Provider & Model' },
   { key: 'stats', label: 'Stats' },
+  { key: 'about', label: 'About' },
 ]
 
 const PROVIDERS = ['Anthropic', 'OpenAI', 'OpenRouter', 'Ollama', 'GitHubCopilot']
+const GITHUB_URL = 'https://github.com/HenrikPankoke/PromptAssistant'
 
 // Map a KeyboardEvent.code to a WPF System.Windows.Input.Key name the backend can parse.
 // Returns null for modifier-only or unsupported keys (recorder keeps waiting).
@@ -149,6 +151,7 @@ export function SettingsView() {
         {section === 'prompts' && <PromptsSection />}
         {section === 'chat' && <ChatSection />}
         {section === 'stats' && <StatsSection />}
+        {section === 'about' && <AboutSection />}
       </div>
     </div>
   )
@@ -454,6 +457,45 @@ function StatsSection() {
             <span className={`w-6 text-right text-xs ${d.count ? 'text-text' : 'text-text-faint'}`}>{d.count}</span>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+// ── About ───────────────────────────────────────────────────────────────────
+function AboutSection() {
+  const { state } = useStore()
+  return (
+    <div className="max-w-xl">
+      <SectionTitle>About</SectionTitle>
+
+      <div className="flex items-center gap-3">
+        <div className="grid h-11 w-11 place-items-center rounded-xl bg-accent text-lg font-bold text-white">P</div>
+        <div>
+          <div className="text-base font-semibold">Prompt Assistant</div>
+          <div className="font-mono text-xs text-text-muted">Version {state.version}</div>
+        </div>
+      </div>
+
+      <p className="mt-4 text-[13px] leading-relaxed text-text-muted">
+        Your AI text sidekick, one hotkey away — in any Windows app. Local-first, provider-agnostic,
+        and open source.
+      </p>
+
+      <div className="mt-5 space-y-3">
+        <button
+          onClick={() => call('openExternal', { url: GITHUB_URL })}
+          className="no-drag inline-flex items-center gap-2 rounded-lg border border-border bg-elevated px-3.5 py-2 text-[13px] text-text transition-colors hover:border-border-strong hover:bg-hover"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 2.5-.34c.85 0 1.71.12 2.5.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.02 10.02 0 0 0 22 12.25C22 6.58 17.52 2 12 2z" />
+          </svg>
+          View on GitHub
+        </button>
+
+        <div className="text-xs text-text-faint">
+          © 2026 Henrik Pankoke · Released under the MIT License
+        </div>
       </div>
     </div>
   )

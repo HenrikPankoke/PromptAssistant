@@ -11,6 +11,10 @@
     <AssemblyName>PromptAssistant</AssemblyName>
     <RootNamespace>PromptAssistant</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Version scheme: Major.Minor.Build.Revision (bump on each release). -->
+    <Version>1.0.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <!-- Drop IntelliSense .xml docs that NuGet packages (WebView2) copy alongside their
          DLLs by default — not needed at runtime, keeps the publish output to just the
          exe + wwwroot. -->

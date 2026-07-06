@@ -151,6 +151,7 @@ const mockState: AppState = {
   startupEnabled: false,
   copilotLoggedIn: false,
   hasSource: true,
+  version: '1.0.0.0',
 }
 
 function mockDaily(): Record<string, number> {

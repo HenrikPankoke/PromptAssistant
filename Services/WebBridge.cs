@@ -125,6 +125,11 @@ namespace PromptAssistant.Services
                         Reply(id, null);
                         break;
 
+                    case "openExternal":
+                        OpenExternal(payload.GetProperty("url").GetString() ?? "");
+                        Reply(id, null);
+                        break;
+
                     case "copilotLogin":
                         Reply(id, null);
                         _ = CopilotLoginAsync();
@@ -187,6 +192,7 @@ namespace PromptAssistant.Services
                 startupEnabled = StartupService.IsEnabled(),
                 copilotLoggedIn = !string.IsNullOrEmpty(App.Settings.Providers.GitHubCopilotToken),
                 hasSource = _host.HasSource,
+                version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0",
             };
         }
 
@@ -309,6 +315,21 @@ namespace PromptAssistant.Services
             };
             if (dlg.ShowDialog() == true)
                 File.WriteAllText(dlg.FileName, markdown, System.Text.Encoding.UTF8);
+        }
+
+        // Opens a URL in the user's default browser. Must go through the shell rather
+        // than an <a href> in the page — otherwise the click would navigate the WebView2
+        // away from the app UI.
+        private static void OpenExternal(string url)
+        {
+            if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                return; // only allow web links
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch { }
         }
 
         private static void OpenConfigFile()

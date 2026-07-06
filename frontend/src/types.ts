@@ -78,4 +78,5 @@ export interface AppState {
   startupEnabled: boolean
   copilotLoggedIn: boolean
   hasSource: boolean
+  version: string
 }
