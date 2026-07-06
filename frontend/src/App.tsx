@@ -14,6 +14,7 @@ export default function App() {
   const [tab, setTab] = useState<'prompts' | 'chat'>('prompts')
   const [promptInput, setPromptInput] = useState('')
   const [focusTick, setFocusTick] = useState(0)
+  const [resetTick, setResetTick] = useState(0)
   const [tokenInfo, setTokenInfo] = useState('')
 
   // Initial load
@@ -35,6 +36,7 @@ export default function App() {
         setTab('prompts')
         setView('main')
         setFocusTick((t) => t + 1)
+        setResetTick((t) => t + 1) // clear any previous output for the new selection
       }),
       on('shown', () => setFocusTick((t) => t + 1)),
       on('theme', ({ theme }: { theme: string }) => {
@@ -97,6 +99,7 @@ export default function App() {
               input={promptInput}
               setInput={setPromptInput}
               focusTick={focusTick}
+              resetTick={resetTick}
               onTokenInfo={setTokenInfo}
               goChatWith={(sys, history) => {
                 setTab('chat')

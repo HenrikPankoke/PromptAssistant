@@ -9,6 +9,7 @@ interface Props {
   input: string
   setInput: (v: string) => void
   focusTick: number
+  resetTick: number
   onTokenInfo: (info: string) => void
   goChatWith: (sys: string, history: ChatMessage[]) => void
 }
@@ -24,7 +25,7 @@ function recipeTooltip(r: Recipe): string {
   return t
 }
 
-export function PromptsView({ input, setInput, focusTick, onTokenInfo, goChatWith }: Props) {
+export function PromptsView({ input, setInput, focusTick, resetTick, onTokenInfo, goChatWith }: Props) {
   const { state, save } = useStore()
   const recipes = useMemo(
     () => [...state.settings.recipes].sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name)),
@@ -67,6 +68,13 @@ export function PromptsView({ input, setInput, focusTick, onTokenInfo, goChatWit
   useEffect(() => {
     inputRef.current?.focus()
   }, [focusTick])
+
+  // A new selection replaced the input — clear the previous output/status too.
+  useEffect(() => {
+    if (resetTick === 0) return // skip initial mount
+    setOutput('')
+    setStatus('')
+  }, [resetTick])
 
   // Report token estimate
   useEffect(() => {
