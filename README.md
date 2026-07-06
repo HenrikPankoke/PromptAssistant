@@ -153,4 +153,4 @@ npm run dev        # opens on http://localhost:5173 in any browser
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) — Copyright © 2026 Henrik Pankoke
