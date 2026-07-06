@@ -4,6 +4,7 @@ obj/
 publish/
 publish-test/
 wwwroot/
+*.zip
 
 # IDE / tooling
 .vs/

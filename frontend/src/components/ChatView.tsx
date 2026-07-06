@@ -24,7 +24,6 @@ export function ChatView({ focusTick }: Props) {
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const lastReplyRef = useRef<HTMLDivElement>(null)
   const handleRef = useRef<StreamHandle | null>(null)
 
   // Seed from "Chat ↗" on prompts view
@@ -89,6 +88,8 @@ export function ChatView({ focusTick }: Props) {
     const base = [...history, { role: 'user', content: text } as ChatMessage]
     setHistory(base)
     setGenerating(true)
+    // Bring the just-sent message to the top so the reply streams in below it.
+    scrollUserToTop()
 
     let acc = ''
     try {
@@ -98,26 +99,33 @@ export function ChatView({ focusTick }: Props) {
       handleRef.current = h
       await h.done
       setHistory([...base, { role: 'assistant', content: acc }])
-      scrollReplyToTop()
+      scrollUserToTop()
     } catch (e: any) {
       if (acc) setHistory([...base, { role: 'assistant', content: acc }])
       else setHistory([...base, { role: 'assistant', content: `⚠ ${e?.message ?? e}` }])
-      scrollReplyToTop()
+      scrollUserToTop()
     } finally {
       setGenerating(false)
       handleRef.current = null
     }
   }
 
-  function scrollReplyToTop() {
-    requestAnimationFrame(() => {
-      const el = lastReplyRef.current
-      const container = scrollRef.current
-      if (!el || !container) return
-      // Land the reply's top just below the previous message, not flush to the edge.
-      const top = el.offsetTop - 14
-      container.scrollTo({ top: Math.max(0, top) })
-    })
+  // Scroll so the latest user message sits at the top of the viewport, with the
+  // reply flowing below it (ChatGPT-style) rather than jumping to the reply's end.
+  // Queries the DOM directly (ref timing under StrictMode was unreliable) and uses
+  // an instant relative scroll computed from bounding rects.
+  function scrollUserToTop() {
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const container = scrollRef.current
+        if (!container) return
+        const users = container.querySelectorAll<HTMLElement>('.justify-end')
+        const el = users[users.length - 1]
+        if (!el) return
+        const delta = el.getBoundingClientRect().top - container.getBoundingClientRect().top - 12
+        container.scrollTop = Math.max(0, container.scrollTop + delta)
+      }),
+    )
   }
 
   function exportMd() {
@@ -188,11 +196,9 @@ export function ChatView({ focusTick }: Props) {
         )}
         {history.map((m, i) => {
           const isUser = m.role === 'user'
-          const isLastAssistant = !isUser && i === history.length - 1
           return (
             <div
               key={i}
-              ref={isLastAssistant ? lastReplyRef : undefined}
               className={`mb-3 flex ${isUser ? 'justify-end' : 'justify-start'}`}
             >
               <div
