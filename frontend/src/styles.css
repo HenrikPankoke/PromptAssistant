@@ -1,0 +1,103 @@
+@import '@fontsource-variable/inter';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light — clean, Notion/Linear-inspired */
+  --bg: #ffffff;
+  --surface: #fbfbfa;
+  --elevated: #f4f4f2;
+  --hover: #f0f0ee;
+  --selected: #ecebfd;
+  --border: #ececea;
+  --border-strong: #dcdcd8;
+  --text: #1f1f22;
+  --text-muted: #6b6b70;
+  --text-faint: #9a9aa0;
+  --accent: #5b57d6;
+  --accent-hover: #4a46c4;
+  --accent-soft: #ecebfd;
+  --accent-text: #4a46c4;
+  --danger: #d64545;
+  --danger-soft: #fbecec;
+}
+
+.dark {
+  --bg: #0f0f11;
+  --surface: #151517;
+  --elevated: #1c1c20;
+  --hover: #222227;
+  --selected: #262433;
+  --border: #26262b;
+  --border-strong: #34343b;
+  --text: #ededf0;
+  --text-muted: #9a9aa2;
+  --text-faint: #6a6a72;
+  --accent: #7c78ee;
+  --accent-hover: #918ef2;
+  --accent-soft: #211f36;
+  --accent-text: #b3b0f7;
+  --danger: #e26a6a;
+  --danger-soft: #2a1a1c;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: theme('fontFamily.sans');
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Draggable window regions — actual dragging is wired in JS (see closeGuard-adjacent
+   startDrag() in TitleBar.tsx) via DragMove() on the host, not CSS app-region, which
+   is a Windows-11-only WebView2 feature that rendered inconsistently on Windows 10.
+   These classes just mark which elements should behave that way. */
+.drag {
+  cursor: default;
+}
+.no-drag {
+  cursor: auto;
+}
+
+/* Text inputs / outputs are selectable */
+input,
+textarea,
+.selectable {
+  user-select: text;
+}
+
+/* Minimal scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Assistant markdown-ish rendering for chat/output */
+.prose-chat {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.55;
+}

@@ -1,0 +1,78 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ══════════════════════════════════════════════════════════════
+         DARK THEME
+    ══════════════════════════════════════════════════════════════ -->
+    <ResourceDictionary x:Key="DarkTheme">
+
+        <!-- Surface -->
+        <SolidColorBrush x:Key="BgPrimary"    Color="#0F0F12"/>
+        <SolidColorBrush x:Key="BgSurface"    Color="#17171C"/>
+        <SolidColorBrush x:Key="BgElevated"   Color="#1E1E26"/>
+        <SolidColorBrush x:Key="BgHover"      Color="#25252F"/>
+        <SolidColorBrush x:Key="BgSelected"   Color="#2A2A38"/>
+
+        <!-- Border -->
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2E2E3A"/>
+        <SolidColorBrush x:Key="BorderMid"    Color="#3E3E52"/>
+
+        <!-- Text -->
+        <SolidColorBrush x:Key="TextPrimary"  Color="#E8E8F0"/>
+        <SolidColorBrush x:Key="TextSecond"   Color="#8888A8"/>
+        <SolidColorBrush x:Key="TextMuted"    Color="#55556A"/>
+        <SolidColorBrush x:Key="TextAccent"   Color="#7C6AF7"/>
+
+        <!-- Accent — violet-indigo -->
+        <SolidColorBrush x:Key="AccentPrimary"  Color="#7C6AF7"/>
+        <SolidColorBrush x:Key="AccentHover"    Color="#9180FF"/>
+        <SolidColorBrush x:Key="AccentSubtle"   Color="#1D1A40"/>
+
+        <!-- Status -->
+        <SolidColorBrush x:Key="Success"   Color="#34C77B"/>
+        <SolidColorBrush x:Key="Warning"   Color="#F5A623"/>
+        <SolidColorBrush x:Key="Danger"    Color="#F05252"/>
+
+        <!-- Scrollbar -->
+        <SolidColorBrush x:Key="ScrollThumb"   Color="#3E3E52"/>
+        <SolidColorBrush x:Key="ScrollTrack"   Color="#17171C"/>
+    </ResourceDictionary>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         LIGHT THEME
+    ══════════════════════════════════════════════════════════════ -->
+    <ResourceDictionary x:Key="LightTheme">
+
+        <!-- Surface -->
+        <SolidColorBrush x:Key="BgPrimary"    Color="#F5F5F8"/>
+        <SolidColorBrush x:Key="BgSurface"    Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="BgElevated"   Color="#FAFAFC"/>
+        <SolidColorBrush x:Key="BgHover"      Color="#EEEEF5"/>
+        <SolidColorBrush x:Key="BgSelected"   Color="#E4E3F8"/>
+
+        <!-- Border -->
+        <SolidColorBrush x:Key="BorderSubtle" Color="#E0E0EC"/>
+        <SolidColorBrush x:Key="BorderMid"    Color="#C8C8DE"/>
+
+        <!-- Text -->
+        <SolidColorBrush x:Key="TextPrimary"  Color="#18181E"/>
+        <SolidColorBrush x:Key="TextSecond"   Color="#5A5A78"/>
+        <SolidColorBrush x:Key="TextMuted"    Color="#AAAABE"/>
+        <SolidColorBrush x:Key="TextAccent"   Color="#5C48E8"/>
+
+        <!-- Accent -->
+        <SolidColorBrush x:Key="AccentPrimary"  Color="#5C48E8"/>
+        <SolidColorBrush x:Key="AccentHover"    Color="#4A38D0"/>
+        <SolidColorBrush x:Key="AccentSubtle"   Color="#EAE8FD"/>
+
+        <!-- Status -->
+        <SolidColorBrush x:Key="Success"   Color="#1A9E5C"/>
+        <SolidColorBrush x:Key="Warning"   Color="#C47A00"/>
+        <SolidColorBrush x:Key="Danger"    Color="#D03030"/>
+
+        <!-- Scrollbar -->
+        <SolidColorBrush x:Key="ScrollThumb"   Color="#C8C8DE"/>
+        <SolidColorBrush x:Key="ScrollTrack"   Color="#F5F5F8"/>
+    </ResourceDictionary>
+
+</ResourceDictionary>

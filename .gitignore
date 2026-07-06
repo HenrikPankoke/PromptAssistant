@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+publish/
+publish-test/
+wwwroot/
+
+# IDE / tooling
+.vs/
+.vscode/
+.claude/
+*.user
+*.suo
+*.binlog
+Properties/PublishProfiles/
+
+# Frontend
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

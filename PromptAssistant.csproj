@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <AssemblyName>PromptAssistant</AssemblyName>
+    <RootNamespace>PromptAssistant</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Drop IntelliSense .xml docs that NuGet packages (WebView2) copy alongside their
+         DLLs by default — not needed at runtime, keeps the publish output to just the
+         exe + wwwroot. -->
+    <AllowedReferenceRelatedFileExtensions>.pdb</AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+
+  <!-- Remove implicit WinForms global usings — they conflict with WPF types.
+       WinForms types needed (NotifyIcon, SendKeys) are accessed via full namespace. -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\icon.ico" Condition="Exists('Resources\icon.ico')" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4022.49" />
+  </ItemGroup>
+
+  <!-- ── Frontend (React + Vite) build ──────────────────────────────────────
+       Builds frontend/ into wwwroot/ before compiling. Incremental via
+       Inputs/Outputs. Set SkipFrontendBuild=true for a C#-only build. -->
+  <ItemGroup>
+    <FrontendSource Include="frontend\src\**\*" />
+    <FrontendSource Include="frontend\index.html" />
+    <FrontendSource Include="frontend\package.json" />
+    <FrontendSource Include="frontend\*.config.*" />
+  </ItemGroup>
+
+  <Target Name="BuildFrontend" BeforeTargets="BeforeBuild"
+          Condition="'$(SkipFrontendBuild)' != 'true'"
+          Inputs="@(FrontendSource)" Outputs="wwwroot\index.html">
+    <Message Importance="high" Text="Installing frontend dependencies…" Condition="!Exists('frontend\node_modules')" />
+    <Exec Command="npm install --no-audit --no-fund" WorkingDirectory="frontend" Condition="!Exists('frontend\node_modules')" />
+    <Message Importance="high" Text="Building frontend (Vite)…" />
+    <Exec Command="npm run build" WorkingDirectory="frontend" />
+  </Target>
+
+  <!-- Register the built frontend as Content so both `dotnet build` (CopyToOutputDirectory)
+       and `dotnet publish` (CopyToPublishDirectory) include it. Must run before
+       AssignTargetPaths — the earliest point publish's file list is computed — and must be
+       a Target-scoped ItemGroup (not a top-level one) so it re-globs at build time, after
+       Vite has actually written the (hashed) output files. -->
+  <Target Name="IncludeFrontendContent" AfterTargets="BuildFrontend" BeforeTargets="AssignTargetPaths;BeforeBuild">
+    <ItemGroup>
+      <Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+</Project>
