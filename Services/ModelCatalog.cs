@@ -29,13 +29,70 @@ namespace PromptAssistant.Services
             new() { Provider = AiProvider.OpenAI, Id = "o3-mini",         DisplayName = "o3 Mini" },
         ];
 
+        // Fallback list used only when the live /models fetch is unavailable (not logged
+        // in, offline, endpoint error). Kept to known-valid Copilot IDs — Claude is left
+        // out here because its Copilot ID varies by account/policy and is discovered live.
         public static List<ModelEntry> GitHubCopilotModels() =>
         [
-            new() { Provider = AiProvider.GitHubCopilot, Id = "gpt-4o",            DisplayName = "GPT-4o (Copilot)" },
-            new() { Provider = AiProvider.GitHubCopilot, Id = "gpt-4o-mini",       DisplayName = "GPT-4o Mini (Copilot)" },
-            new() { Provider = AiProvider.GitHubCopilot, Id = "o1",                DisplayName = "o1 (Copilot)" },
-            new() { Provider = AiProvider.GitHubCopilot, Id = "claude-sonnet-4-6", DisplayName = "Claude Sonnet 4.6 (Copilot)" },
+            new() { Provider = AiProvider.GitHubCopilot, Id = "gpt-4o",      DisplayName = "GPT-4o (Copilot)" },
+            new() { Provider = AiProvider.GitHubCopilot, Id = "gpt-4o-mini", DisplayName = "GPT-4o Mini (Copilot)" },
+            new() { Provider = AiProvider.GitHubCopilot, Id = "o1",          DisplayName = "o1 (Copilot)" },
         ];
+
+        // ── Dynamic: GitHub Copilot ────────────────────────────────────────────
+        // Lists the models the user's Copilot subscription actually exposes (correct IDs,
+        // respecting account/policy enablement) from the same endpoint + auth the chat
+        // requests use. Falls back to the static list on any failure so the dropdown is
+        // never empty and the provider stays usable.
+        public static async Task<List<ModelEntry>> FetchGitHubCopilotModelsAsync(string token)
+        {
+            if (string.IsNullOrEmpty(token)) return GitHubCopilotModels();
+
+            try
+            {
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+                var req = new System.Net.Http.HttpRequestMessage(HttpMethod.Get, "https://api.githubcopilot.com/models");
+                req.Headers.Add("Authorization", $"Bearer {token}");
+                req.Headers.Add("Copilot-Integration-Id", "vscode-chat");
+                req.Headers.Add("Editor-Version", "vscode/1.90.0");
+
+                using var resp = await http.SendAsync(req);
+                if (!resp.IsSuccessStatusCode) return GitHubCopilotModels();
+
+                var json = await resp.Content.ReadAsStringAsync();
+                var doc = JsonDocument.Parse(json);
+                if (!doc.RootElement.TryGetProperty("data", out var arr))
+                    return GitHubCopilotModels();
+
+                var seen = new HashSet<string>();
+                var result = new List<ModelEntry>();
+                foreach (var m in arr.EnumerateArray())
+                {
+                    var id = m.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
+                    if (string.IsNullOrEmpty(id) || !seen.Add(id)) continue;
+
+                    // Keep only chat-capable models (skip embeddings) when capability info is present.
+                    if (m.TryGetProperty("capabilities", out var caps) &&
+                        caps.TryGetProperty("type", out var capType) &&
+                        capType.GetString() is string t && t != "chat")
+                        continue;
+
+                    var name = m.TryGetProperty("name", out var n) ? n.GetString() ?? id : id;
+                    result.Add(new ModelEntry
+                    {
+                        Provider = AiProvider.GitHubCopilot,
+                        Id = id,
+                        DisplayName = $"{name} (Copilot)"
+                    });
+                }
+
+                return result.Count > 0 ? result : GitHubCopilotModels();
+            }
+            catch
+            {
+                return GitHubCopilotModels();
+            }
+        }
 
         // ── Dynamic: Ollama ────────────────────────────────────────────────────
         public static async Task<List<ModelEntry>> FetchOllamaModelsAsync(string baseUrl)

@@ -11,6 +11,18 @@ namespace PromptAssistant.Services
     {
         private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(120) };
 
+        // Like EnsureSuccessStatusCode, but includes the response body in the exception so
+        // errors like an unsupported/disabled Copilot model surface *why* (not just "400").
+        private static async Task EnsureSuccessWithBodyAsync(HttpResponseMessage resp, CancellationToken ct)
+        {
+            if (resp.IsSuccessStatusCode) return;
+            string body = "";
+            try { body = await resp.Content.ReadAsStringAsync(ct); } catch { }
+            if (body.Length > 500) body = body[..500];
+            var detail = string.IsNullOrWhiteSpace(body) ? "" : $" — {body}";
+            throw new HttpRequestException($"{(int)resp.StatusCode} {resp.ReasonPhrase}{detail}");
+        }
+
         // ── Entry point ────────────────────────────────────────────────────────
         public async IAsyncEnumerable<string> StreamAsync(
             CompletionRequest req,
@@ -277,7 +289,7 @@ namespace PromptAssistant.Services
             req.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
 
             using var resp = await Http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
-            resp.EnsureSuccessStatusCode();
+            await EnsureSuccessWithBodyAsync(resp, ct);
 
             using var stream = await resp.Content.ReadAsStreamAsync(ct);
             using var reader = new System.IO.StreamReader(stream);
@@ -354,7 +366,7 @@ namespace PromptAssistant.Services
             req.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
 
             using var resp = await Http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
-            resp.EnsureSuccessStatusCode();
+            await EnsureSuccessWithBodyAsync(resp, ct);
 
             using var stream = await resp.Content.ReadAsStreamAsync(ct);
             using var reader = new System.IO.StreamReader(stream);

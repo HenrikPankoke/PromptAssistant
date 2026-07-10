@@ -200,7 +200,7 @@ namespace PromptAssistant.Services
         {
             "Anthropic" => ModelCatalog.AnthropicModels(),
             "OpenAI" => ModelCatalog.OpenAiModels(),
-            "GitHubCopilot" => ModelCatalog.GitHubCopilotModels(),
+            "GitHubCopilot" => await ModelCatalog.FetchGitHubCopilotModelsAsync(App.Settings.Providers.GitHubCopilotToken),
             "Ollama" => await ModelCatalog.FetchOllamaModelsAsync(App.Settings.Providers.OllamaBaseUrl),
             "OpenRouter" => await ModelCatalog.FetchOpenRouterModelsAsync(App.Settings.Providers.OpenRouterApiKey),
             _ => new List<ModelEntry>(),
